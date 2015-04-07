@@ -6,29 +6,29 @@ import com.team.drawables.Triangle;
 
 import java.applet.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Arrays;
 
-public class Main extends Applet implements Runnable
+public class Main extends Applet implements Runnable, KeyListener
 {
     //dimensions in pixels
     int width = 1280;
     int height = 720;
-    int numPointsPerTriangle = 9;
-    int numPointsPerLine = 3;
+    int numPointsPerTriangle = 99;
+    int numPointsPerLine = 33;
 
     Triangle tri1;
     Triangle tri2;
     Line line;
-    Sphere sp1;
-    Sphere sp2;
-    Sphere sp3;
-    Sphere sp4;
+    Sphere[] leftSpheres;
+    Sphere[] rightSpheres;
 
     Thread runner;
 
     public void start()
     {
-        if(runner == null)
+        if (runner == null)
         {
             runner = new Thread(this);
             runner.start();
@@ -37,7 +37,7 @@ public class Main extends Applet implements Runnable
 
     public void stop()
     {
-        if(runner != null)
+        if (runner != null)
         {
             runner.stop();
             runner = null;
@@ -46,7 +46,7 @@ public class Main extends Applet implements Runnable
 
     public void run()
     {
-        while(true)
+        while (true)
         {
             repaint();
             try
@@ -63,6 +63,7 @@ public class Main extends Applet implements Runnable
 
     public void init()
     {
+        addKeyListener(this);
         setSize(width, height);
         setBackground(Color.white);
 
@@ -71,10 +72,13 @@ public class Main extends Applet implements Runnable
 
         int closestPointIndex = numPointsPerTriangle / 3;
         line = new Line(tri1.getPoints()[closestPointIndex], tri2.getPoints()[closestPointIndex], numPointsPerLine);
-        sp1 = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, true, "blue");
-        sp2 = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, false, "blue");
-        sp3 = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, true, "red");
-        sp4 = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, false, "red");
+
+        leftSpheres = new Sphere[2];
+        rightSpheres = new Sphere[2];
+        leftSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, true, "blue");
+        leftSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, false, "blue");
+        rightSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, true, "red");
+        rightSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, false, "red");
     }
 
     public void paint(Graphics g)
@@ -84,13 +88,61 @@ public class Main extends Applet implements Runnable
         line.draw(g);
         try
         {
-            sp1.draw(g);
-            sp2.draw(g);
-            sp3.draw(g);
-            sp4.draw(g);
+            leftSpheres[0].draw(g);
+            leftSpheres[1].draw(g);
+            rightSpheres[0].draw(g);
+            rightSpheres[1].draw(g);
         } catch (NoSuchFieldException e)
         {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e)
+    {
+
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e)
+    {
+
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e)
+    {
+        char dir = e.getKeyChar();
+        boolean inc;
+        if (dir == '1' || dir == 'q')
+        {
+            if (dir == '1')
+                inc = true;
+            else
+                inc = false;
+            leftSpheres[0].changeSpeed(inc);
+        } else if (dir == '2' || dir == 'w')
+        {
+            if (dir == '2')
+                inc = true;
+            else
+                inc = false;
+            leftSpheres[1].changeSpeed(inc);
+        } else if (dir == '3' || dir == 'e')
+        {
+            if (dir == '3')
+                inc = true;
+            else
+                inc = false;
+            rightSpheres[0].changeSpeed(inc);
+        } else if (dir == '4' || dir == 'r')
+        {
+            if (dir == '4')
+                inc = true;
+            else
+                inc = false;
+            rightSpheres[1].changeSpeed(inc);
         }
     }
 }

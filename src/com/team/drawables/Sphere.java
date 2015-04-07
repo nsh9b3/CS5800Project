@@ -35,7 +35,7 @@ public class Sphere
         for (int i = 0; i < (numTriPos - 1); i++)
         {
             points[i] = new Point(triPoints1[k]);
-            if(startLeft)
+            if (startLeft)
             {
                 if (isFirst && k == 0)
                     pointPos = i - 1;
@@ -52,7 +52,7 @@ public class Sphere
         for (int i = numTriPos + numLinePos - 1; i < (2 * numTriPos + numLinePos) - 2; i++)
         {
             points[i] = triPoints2[k];
-            if(!startLeft)
+            if (! startLeft)
             {
                 if (isFirst && k == 0)
                     pointPos = i - 1;
@@ -98,5 +98,18 @@ public class Sphere
     {
         pointPos = (pointPos + speed) % numLocations;
         center = points[pointPos];
+    }
+
+    public void changeSpeed(boolean inc)
+    {
+        if (inc)
+        {
+            speed = speed + 1;
+        } else
+        {
+            speed = speed - 1;
+            if (speed < 0)
+                speed = 0;
+        }
     }
 }

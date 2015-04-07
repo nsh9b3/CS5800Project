@@ -16,17 +16,14 @@ public class Main extends Applet
 
     Triangle tri1;
     Triangle tri2;
-    Line line;
-    Sphere sphere1;
 
     public void init()
     {
         setSize(width, height);
         setBackground(Color.white);
-        tri1 = new Triangle(width, height, true, "A");
-        tri2 = new Triangle(width, height, false, "B");
-        line = new Line(tri1.getClosestXPoint(), tri1.getClosestYPoint(), tri2.getClosestXPoint(), tri2.getClosestYPoint());
-        sphere1 = new Sphere(width / 2, height / 2, 50, 50, 50, new int[]{}, new int[]{}, new int[]{}, 10, "red");
+
+        tri1 = new Triangle(width, height, 3, true, "A");
+        tri2 = new Triangle(width, height, 3, false, "B");
     }
 
     @Override
@@ -34,14 +31,6 @@ public class Main extends Applet
     {
         tri1.draw(g);
         tri2.draw(g);
-        line.draw(g);
-        try
-        {
-            sphere1.draw(g);
-        } catch (NoSuchFieldException e)
-        {
-            e.printStackTrace();
-        }
     }
 
 }

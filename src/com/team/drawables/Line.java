@@ -1,22 +1,40 @@
 package com.team.drawables;
 
-import java.awt.Graphics;
+
+import com.team.Point;
+
+import java.awt.*;
 
 public class Line
 {
-    int xPos0, xPos1;
-    int yPos0, yPos1;
+    //This is the list of Points making up the line
+    Point[] points;
 
-    public Line(int xPos0, int yPos0, int xPos1, int yPos1)
+    public Line(Point left, Point right, int numPoints)
     {
-        this.xPos0 = xPos0;
-        this.yPos0 = yPos0;
-        this.xPos1 = xPos1;
-        this.yPos1 = yPos1;
+        //Create list of points used for the Line
+        points = new Point[numPoints];
+
+        //This list starts from the left most point and goes to the right most point
+        points[0] = new Point(left);
+        points[numPoints - 1] = new Point(right);
+
+        //increment is the difference between each x value in the array points
+        int increment = (right.getX() - left.getX()) / numPoints;
+
+        //yValue is the same across all points
+        int yValue = left.getY();
+
+        //Create a for loop to fill points with data
+        for (int i = 1; i < numPoints - 1; i++)
+        {
+            points[i] = new Point(points[i - 1].getX() + increment, yValue);
+        }
     }
 
     public void draw(Graphics g)
     {
-        g.drawLine(xPos0, yPos0, xPos1, yPos1);
+        //Only use the first and last Point to draw the line
+        g.drawLine(points[0].getX(), points[0].getY(), points[points.length - 1].getX(), points[points.length - 1].getY());
     }
 }

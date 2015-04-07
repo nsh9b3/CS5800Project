@@ -10,14 +10,14 @@ public class Sphere
 
     int radius;
 
-    int[] xPoints;
+    int[] tri1Pos;
     int[] yPoints;
 
     int speed;
 
     String color;
 
-    public Sphere(int xCenter, int yCenter, int radius, int numTriLoc, int numLineLoc, int tri1Pos[], int linePos[], int tri2Pos[], int speed, String color)
+    public Sphere(int xCenter, int yCenter, int radius, int numLinePos, int numTriPos, int speed, String color)
     {
         this.xCenter = xCenter;
         this.yCenter = yCenter;
@@ -28,6 +28,7 @@ public class Sphere
 
     public void draw(Graphics g) throws NoSuchFieldException
     {
+        updatePosition();
         Color spColor;
         try
         {
@@ -42,5 +43,10 @@ public class Sphere
             e.printStackTrace();
         }
         g.fillOval(xCenter, yCenter - (radius / 2), radius, radius);
+    }
+
+    public void updatePosition()
+    {
+
     }
 }

@@ -1,7 +1,10 @@
 package com.team.drawables;
 
+import com.team.Point;
+
 import java.awt.Font;
 import java.awt.Graphics;
+import java.util.Arrays;
 
 public class Triangle
 {
@@ -15,110 +18,93 @@ public class Triangle
 
     String x;
 
-    public Triangle(int width, int height, boolean isLeft, String x)
+    Point[] points;
+
+    String name;
+
+    int width;
+    int height;
+    int numPointsPerLine;
+    int numPointsTotal;
+
+    int nameLocationX;
+    int nameLocationY;
+
+    public Triangle(int width, int height, int numPointsTotal, boolean isLeft, String name)
     {
-        screenHeight = height;
-        screenWidth = width;
+        this.width = width;
+        this.height = height;
+        this.numPointsTotal = numPointsTotal;
+
+        //If the number of points is not divisible by 3... make it
+        while (numPointsTotal % 3 != 0)
+        {
+            numPointsTotal++;
+        }
+
+        points = new Point[numPointsTotal];
+
+        this.numPointsPerLine = numPointsTotal / 3;
 
         this.isLeft = isLeft;
-        this.x = x;
+        this.name = name;
 
-        int halfWidth = (int) Math.floor(width / 2);
-        int halfHeight = (int) Math.floor(height / 2);
+        int halfWidth = width / 2;
+        int halfHeight = height / 2;
 
         int maxHeight = height - (int) (halfHeight + halfHeight / Math.sqrt(3));
         int minHeight = height - (int) (halfHeight - halfHeight / Math.sqrt(3));
 
-        yPos = new int[]{maxHeight, halfHeight, minHeight};
+        int fourthWidth = halfWidth / 2;
+        int furthestPoint;
 
-        if(isLeft)
+        if (isLeft)
         {
-            int fourthWidth = (int) Math.floor(halfWidth / 2);
             closestPoint = (fourthWidth + halfWidth) / 2;
-            int furthestPoint = (fourthWidth) / 2;
-
-            xPos = new int[]{furthestPoint, closestPoint, furthestPoint};
-        }
-        else
+            furthestPoint = (fourthWidth) / 2;
+        } else
         {
-            int fourthWidth = width - (int) Math.floor(halfWidth / 2);
-            closestPoint = (halfWidth + fourthWidth) / 2;
-            int furthestPoint = (fourthWidth + width) / 2;
-
-            xPos = new int[]{furthestPoint, closestPoint, furthestPoint};
+            closestPoint = (halfWidth + halfWidth + fourthWidth) / 2;
+            furthestPoint = (halfWidth + fourthWidth + width) / 2;
         }
-    }
 
-    public int getClosestXPoint()
-    {
-        return closestPoint;
-    }
+        points[0] = new Point(furthestPoint, maxHeight);
+        points[numPointsPerLine] = new Point(closestPoint, halfHeight);
+        points[2 * numPointsPerLine] = new Point(furthestPoint, minHeight);
 
-    public int getClosestYPoint()
-    {
-        return (int) Math.floor(screenHeight / 2);
+        xPos = new int[] {furthestPoint, closestPoint, furthestPoint};
+        yPos = new int[] {maxHeight, halfHeight, minHeight};
+
+        for (int i = 0; i < 3; i++)
+        {
+            int xIncrement = (points[((i + 1) % 3) * numPointsPerLine].getX() - points[i * numPointsPerLine].getX()) / numPointsPerLine;
+            int yIncrement = (points[((i + 1) % 3) * numPointsPerLine].getY() - points[i * numPointsPerLine].getY()) / numPointsPerLine;
+
+            for (int k = 1; k < numPointsPerLine; k++)
+            {
+                points[(i * numPointsPerLine) + k] = new Point(points[(i * numPointsPerLine) + k - 1].getX() + xIncrement, points[(i * numPointsPerLine) + k - 1].getY() + yIncrement);
+            }
+        }
+
+        if (isLeft)
+            nameLocationX = furthestPoint + (closestPoint - furthestPoint) / 2;
+        else
+            nameLocationX = closestPoint + (furthestPoint - closestPoint) / 2;
+        nameLocationY = halfHeight;
     }
 
     public void draw(Graphics g)
     {
-        g.setFont(new Font("TimesRoman", Font.PLAIN, 50));
         g.drawPolygon(xPos, yPos, 3);
-        if(isLeft)
-            g.drawString(x, screenWidth / 4, screenHeight / 2);
-        else
-            g.drawString(x, (3 * screenWidth) / 4, screenHeight / 2);
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 50));
+        int xCent = (int) g.getFontMetrics().stringWidth(name);
+        int yCent = (int) g. getFontMetrics().getStringBounds(name, g).getHeight();
+        g.drawString(name, nameLocationX - (xCent / 2), nameLocationY + (yCent / 4));
     }
 
-    public int[] getXPositions(int numLoc)
+    public Point[] getPoints()
     {
-        while(numLoc % 3 != 0)
-        {
-            numLoc = numLoc + 1;
-        }
-
-        int[] allXPos = new int[numLoc];
-        int thirdLoc = numLoc / 3;
-
-        allXPos[0] = xPos[0];
-        allXPos[thirdLoc] = xPos[1];
-        allXPos[2 * thirdLoc] = xPos[2];
-
-        for(int i = 0; i < 3; i++)
-        {
-            int xDiff = (allXPos[((i + 1) % 3) * thirdLoc] - allXPos[i * thirdLoc]) / thirdLoc;
-
-            for(int k = 1; k < thirdLoc; k++)
-            {
-                allXPos[i * thirdLoc + k] = allXPos[i * thirdLoc] + k * xDiff;
-            }
-        }
-        return allXPos;
-    }
-
-    public int[] getYPositions(int numLoc)
-    {
-        while(numLoc % 3 != 0)
-        {
-            numLoc = numLoc + 1;
-        }
-
-        int[] allYPos = new int[numLoc];
-        int thirdLoc = numLoc / 3;
-
-        allYPos[0] = yPos[0];
-        allYPos[thirdLoc] = yPos[1];
-        allYPos[2 * thirdLoc] = yPos[2];
-
-        for(int i = 0; i < 3; i++)
-        {
-            int xDiff = (allYPos[((i + 1) % 3) * thirdLoc] - allYPos[i * thirdLoc]) / thirdLoc;
-
-            for(int k = 1; k < thirdLoc; k++)
-            {
-                allYPos[i * thirdLoc + k] = allYPos[i * thirdLoc] + k * xDiff;
-            }
-        }
-        return allYPos;
+        return points;
     }
 }
 

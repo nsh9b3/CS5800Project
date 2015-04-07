@@ -10,13 +10,8 @@ public class Triangle
 {
     int[] xPos;
     int[] yPos;
-    int closestPoint;
 
     boolean isLeft;
-    int screenHeight;
-    int screenWidth;
-
-    String x;
 
     Point[] points;
 
@@ -57,6 +52,7 @@ public class Triangle
 
         int fourthWidth = halfWidth / 2;
         int furthestPoint;
+        int closestPoint;
 
         if (isLeft)
         {

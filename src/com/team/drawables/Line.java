@@ -4,6 +4,7 @@ package com.team.drawables;
 import com.team.Point;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public class Line
 {
@@ -20,7 +21,7 @@ public class Line
         points[numPoints - 1] = new Point(right);
 
         //increment is the difference between each x value in the array points
-        int increment = (right.getX() - left.getX()) / numPoints;
+        int increment = (right.getX() - left.getX()) / (numPoints - 1);
 
         //yValue is the same across all points
         int yValue = left.getY();
@@ -30,6 +31,11 @@ public class Line
         {
             points[i] = new Point(points[i - 1].getX() + increment, yValue);
         }
+    }
+
+    public Point[] getPoints()
+    {
+        return points;
     }
 
     public void draw(Graphics g)

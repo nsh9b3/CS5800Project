@@ -34,7 +34,7 @@ public class Main extends Applet implements Runnable, KeyListener
             runner.start();
         }
     }
-
+// So...stop is deprecated ... ? oracle site suggests just setting the Tread to null only.
     public void stop()
     {
         if (runner != null)

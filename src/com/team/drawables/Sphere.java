@@ -91,6 +91,7 @@ public class Sphere
             e.printStackTrace();
         }
         g.fillOval((int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2), radius, radius);
+        g.drawString(String.valueOf(speed),center.getX() - (radius / 2), (int) center.getY() - (radius / 2));
         updatePosition();
     }
 

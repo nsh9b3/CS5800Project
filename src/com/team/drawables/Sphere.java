@@ -15,17 +15,20 @@ public class Sphere
     int pointPos;
     int numLocations;
 
+    String title;
+
     Point[] points;
 
     String color;
 
 
-    public Sphere(int radius, int numLinePos, Point[] linePoints, int numTriPos, Point[] triPoints1, Point[] triPoints2, int speed, boolean startLeft, boolean isFirst, String color)
+    public Sphere(int radius, int numLinePos, Point[] linePoints, int numTriPos, Point[] triPoints1, Point[] triPoints2, int speed, boolean startLeft, boolean isFirst, String color,String title)
     {
 
         this.radius = radius;
         this.speed = speed;
         this.color = color.toUpperCase();
+        this.title = String.valueOf(title);
 
         numLocations = (2 * numTriPos) + (2 * numLinePos) - 2;
 
@@ -91,7 +94,9 @@ public class Sphere
             e.printStackTrace();
         }
         g.fillOval((int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2), radius, radius);
-        g.drawString(String.valueOf(speed),center.getX() - (radius / 2), (int) center.getY() - (radius / 2));
+        g.setColor(Color.black);
+        g.drawString(title,(int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2));
+        g.drawString("Speed " + String.valueOf(speed), center.getX() - (radius), (int) center.getY() + radius);
         updatePosition();
     }
 

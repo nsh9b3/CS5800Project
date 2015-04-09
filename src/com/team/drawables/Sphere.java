@@ -4,7 +4,11 @@ import com.team.Point;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.sql.Timestamp;
+import java.util.Calendar;
+
 import java.util.Arrays;
+
 
 public class Sphere
 {
@@ -16,11 +20,14 @@ public class Sphere
     int numLocations;
 
     String title;
-
+    Point nextPoint;
     Point[] points;
 
     String color;
 
+    Point[] line;
+    Timestamp time = new Timestamp(Calendar.getInstance().getTime().getTime());
+    boolean makeRequests = false;
 
     public Sphere(int radius, int numLinePos, Point[] linePoints, int numTriPos, Point[] triPoints1, Point[] triPoints2, int speed, boolean startLeft, boolean isFirst, String color,String title)
     {
@@ -29,7 +36,7 @@ public class Sphere
         this.speed = speed;
         this.color = color.toUpperCase();
         this.title = String.valueOf(title);
-
+        this.line = linePoints;
         numLocations = (2 * numTriPos) + (2 * numLinePos) - 2;
 
         points = new Point[numLocations];
@@ -81,6 +88,7 @@ public class Sphere
     public void draw(Graphics g) throws NoSuchFieldException
     {
         Color spColor;
+        time.setTime(Calendar.getInstance().getTime().getTime());
         try
         {
             Field field = Class.forName("java.awt.Color").getField(color);
@@ -97,13 +105,23 @@ public class Sphere
         g.setColor(Color.black);
         g.drawString(title,(int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2));
         g.drawString("Speed " + String.valueOf(speed), center.getX() - (radius), (int) center.getY() + radius);
-        updatePosition();
+        updatePosition(g);
     }
 
-    public void updatePosition()
+    public void updatePosition(Graphics g)
     {
         pointPos = (pointPos + speed) % numLocations;
         center = points[pointPos];
+        this.nextPoint = points[(pointPos + speed) % numLocations];
+// Only show timestamp when your at the line.
+        if(Arrays.asList(this.line).contains(this.nextPoint))
+        {
+            makeRequests = true;
+            time.setTime(Calendar.getInstance().getTime().getTime());
+            g.drawString(time.toString(), (int) center.getX() + (radius / 2), (int) center.getY() - (radius / 2));
+        }else{
+            g.drawString("",(int) center.getX() + (radius / 2), (int) center.getY() - (radius / 2));
+        }
     }
 
     public void changeSpeed(boolean inc)

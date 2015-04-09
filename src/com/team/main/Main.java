@@ -105,10 +105,13 @@ public class Main extends Applet implements Runnable, KeyListener
 
     }
 
+    // Creating key press to try to swap between "modes"
     @Override
     public void keyPressed(KeyEvent e)
     {
-
+        char dir = e.getKeyChar();
+        if (dir == 'c'){
+        }
     }
 
     @Override

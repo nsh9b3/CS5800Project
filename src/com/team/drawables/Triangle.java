@@ -78,7 +78,8 @@ public class Triangle
 
             for (int k = 1; k < numPointsPerLine; k++)
             {
-                points[(i * numPointsPerLine) + k] = new Point(points[(i * numPointsPerLine) + k - 1].getX() + xIncrement, points[(i * numPointsPerLine) + k - 1].getY() + yIncrement);
+                //points[(i * numPointsPerLine) + k] = new Point(points[(i * numPointsPerLine) + k - 1].getX() + xIncrement, points[(i * numPointsPerLine) + k - 1].getY() + yIncrement);
+                points[(i * numPointsPerLine) + k] = new Point(points[i * numPointsPerLine].getX() + (xIncrement * k), points[i * numPointsPerLine].getY() + (yIncrement * k));
             }
         }
 

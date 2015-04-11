@@ -26,12 +26,18 @@ public class Sphere
     String color;
 
     Point[] line;
+
     Timestamp time = new Timestamp(Calendar.getInstance().getTime().getTime());
     boolean makeRequests = false;
 
-    public Sphere(int radius, int numLinePos, Point[] linePoints, int numTriPos, Point[] triPoints1, Point[] triPoints2, int speed, boolean startLeft, boolean isFirst, String color,String title)
-    {
+    boolean inCriticalSection;
+    int criticalSectionMin1;
+    int criticalSectionMax1;
+    int criticalSectionMin2;
+    int criticalSectionMax2;
 
+    public Sphere(int radius, int numLinePos, Point[] linePoints, int numTriPos, Point[] triPoints1, Point[] triPoints2, int speed, boolean startLeft, boolean isFirst, String color, String title)
+    {
         this.radius = radius;
         this.speed = speed;
         this.color = color.toUpperCase();
@@ -54,10 +60,12 @@ public class Sphere
             }
             k = (k + 1) % numTriPos;
         }
+        criticalSectionMin1 = numTriPos - 1;
         for (int i = numTriPos - 1; i < (numTriPos + numLinePos) - 1; i++)
         {
             points[i] = linePoints[i - numTriPos + 1];
         }
+        criticalSectionMax1 = (numTriPos + numLinePos) - 2;
         k = (numTriPos / 3) - 1;
         for (int i = numTriPos + numLinePos - 1; i < (2 * numTriPos + numLinePos) - 2; i++)
         {
@@ -74,15 +82,17 @@ public class Sphere
                 k = numTriPos - 1;
         }
         k = 0;
+        criticalSectionMin2 = (2 * numTriPos + numLinePos) - 2;
         for (int i = (2 * numTriPos) + numLinePos - 2; i < (2 * numTriPos + 2 * numLinePos) - 2; i++)
         {
             points[i] = linePoints[numLinePos - 1 - k];
             k = k + 1;
         }
+        criticalSectionMax2 = (2 * numTriPos + 2 * numLinePos) - 3;
 
 
         this.center = new Point(points[pointPos]);
-
+        this.inCriticalSection = false;
     }
 
     public void draw(Graphics g) throws NoSuchFieldException
@@ -101,10 +111,18 @@ public class Sphere
         {
             e.printStackTrace();
         }
+        if((pointPos >= criticalSectionMin1 && pointPos <= criticalSectionMax1) || (pointPos >= criticalSectionMin2 && pointPos <= criticalSectionMax2))
+            g.setColor(Color.GREEN);
         g.fillOval((int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2), radius, radius);
-        g.setColor(Color.black);
-        g.drawString(title,(int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2));
-        g.drawString("Speed " + String.valueOf(speed), center.getX() - (radius), (int) center.getY() + radius);
+        g.setColor(Color.white);
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 15));
+        int xCent = (int) g.getFontMetrics().stringWidth(title);
+        int yCent = (int) g. getFontMetrics().getStringBounds(title, g).getHeight();
+        g.drawString(title, center.getX() - (xCent / 2), center.getY() - (yCent / 4));
+        g.setFont(new Font("TimesRoman", Font.PLAIN, 15));
+        xCent = (int) g.getFontMetrics().stringWidth("Speed " + String.valueOf(speed));
+        yCent = (int) g. getFontMetrics().getStringBounds("Speed " + String.valueOf(speed), g).getHeight();
+        g.drawString("Speed " + String.valueOf(speed), center.getX() - (xCent / 2), (int) center.getY() + (yCent / 2));
         updatePosition(g);
     }
 
@@ -112,16 +130,17 @@ public class Sphere
     {
         pointPos = (pointPos + speed) % numLocations;
         center = points[pointPos];
-        this.nextPoint = points[(pointPos + speed) % numLocations];
-// Only show timestamp when your at the line.
-        if(Arrays.asList(this.line).contains(this.nextPoint))
+        /*this.nextPoint = points[(pointPos + speed) % numLocations];
+        // Only show timestamp when your at the line.
+        if (Arrays.asList(this.line).contains(this.nextPoint))
         {
             makeRequests = true;
             time.setTime(Calendar.getInstance().getTime().getTime());
             g.drawString(time.toString(), (int) center.getX() + (radius / 2), (int) center.getY() - (radius / 2));
-        }else{
-            g.drawString("",(int) center.getX() + (radius / 2), (int) center.getY() - (radius / 2));
-        }
+        } else
+        {
+            g.drawString("", (int) center.getX() + (radius / 2), (int) center.getY() - (radius / 2));
+        }*/
     }
 
     public void changeSpeed(boolean inc)
@@ -136,4 +155,15 @@ public class Sphere
                 speed = 0;
         }
     }
+
+    public void setInCriticalSection(boolean inCriticalSection)
+    {
+        this.inCriticalSection = inCriticalSection;
+    }
+
+    public boolean getIsInCriticalSection()
+    {
+        return this.inCriticalSection;
+    }
+
 }

@@ -8,15 +8,14 @@ import java.applet.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.util.Arrays;
 
 public class Main extends Applet implements Runnable, KeyListener
 {
     //dimensions in pixels
     int width = 1280;
     int height = 720;
-    int numPointsPerTriangle = 99;
-    int numPointsPerLine = 33;
+    int numPointsPerTriangle = 300;
+    int numPointsPerLine = 100;
 
     Triangle tri1;
     Triangle tri2;
@@ -51,7 +50,7 @@ public class Main extends Applet implements Runnable, KeyListener
             repaint();
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(600);
             } catch (InterruptedException e)
             {
                 e.printStackTrace();
@@ -75,14 +74,17 @@ public class Main extends Applet implements Runnable, KeyListener
 
         leftSpheres = new Sphere[2];
         rightSpheres = new Sphere[2];
-        leftSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, true, "blue","1/Q");
-        leftSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, false, "blue","2/W");
-        rightSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, true, "red", "3/E");
-        rightSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, false, "red", "4/R");
+        leftSpheres[0] = new Sphere(75, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, true, "blue","1/Q");
+        leftSpheres[1] = new Sphere(75, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, false, "blue","2/W");
+        rightSpheres[0] = new Sphere(75, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, true, "red", "3/E");
+        rightSpheres[1] = new Sphere(75, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, false, "red", "4/R");
     }
 
+    @Override
     public void paint(Graphics g)
     {
+
+
         g.drawString("Press the corresponding number or letter key to speed up or slow down the sphere.",100,50);
         tri1.draw(g);
         tri2.draw(g);

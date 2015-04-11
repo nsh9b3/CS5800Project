@@ -34,7 +34,7 @@ public class Main extends Applet implements Runnable, KeyListener
             runner.start();
         }
     }
-
+// So...stop is deprecated ... ? oracle site suggests just setting the Tread to null only.
     public void stop()
     {
         if (runner != null)
@@ -75,14 +75,15 @@ public class Main extends Applet implements Runnable, KeyListener
 
         leftSpheres = new Sphere[2];
         rightSpheres = new Sphere[2];
-        leftSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, true, "blue");
-        leftSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, false, "blue");
-        rightSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, true, "red");
-        rightSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, false, "red");
+        leftSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, true, "blue","1/Q");
+        leftSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, false, "blue","2/W");
+        rightSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, true, "red", "3/E");
+        rightSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, false, "red", "4/R");
     }
 
     public void paint(Graphics g)
     {
+        g.drawString("Press the corresponding number or letter key to speed up or slow down the sphere.",100,50);
         tri1.draw(g);
         tri2.draw(g);
         line.draw(g);
@@ -104,10 +105,13 @@ public class Main extends Applet implements Runnable, KeyListener
 
     }
 
+    // Creating key press to try to swap between "modes"
     @Override
     public void keyPressed(KeyEvent e)
     {
-
+        char dir = e.getKeyChar();
+        if (dir == 'c'){
+        }
     }
 
     @Override

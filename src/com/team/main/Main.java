@@ -91,7 +91,7 @@ public class Main extends Applet implements Runnable, KeyListener
             leftSpheres[0].draw(g);
             leftSpheres[1].draw(g);
             rightSpheres[0].draw(g);
-            rightSpheres[1].draw(g); 
+            rightSpheres[1].draw(g);
         } catch (NoSuchFieldException e)
         {
             e.printStackTrace();

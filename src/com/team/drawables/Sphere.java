@@ -175,6 +175,18 @@ public class Sphere
         fellowSpheres[3] = right[1];
     }
 
+
+    public void whoAreMyFellowSpheres(Sphere[] spheres)
+    {
+        fellowSpheres = new Sphere[spheres.length-1];
+        for(int i = 0; i < fellowSpheres.length; i++){
+            if(spheres[i] != this){
+               fellowSpheres[i] = spheres[i];
+            }
+        }
+    }
+
+
     // Finds out if other spheres are ok with this accessing CS
     private void makeRequests()
     {

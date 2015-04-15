@@ -21,8 +21,8 @@ public class Main extends Applet implements Runnable, KeyListener
     Triangle tri1;
     Triangle tri2;
     Line line;
-    Sphere[] leftSpheres;
-    Sphere[] rightSpheres;
+
+    Sphere[] spheres;
 
     Thread runner;
 
@@ -63,6 +63,9 @@ public class Main extends Applet implements Runnable, KeyListener
 
     public void init()
     {
+        String color;
+        boolean left,first;
+        String[] titles = {"1/Q","2/W","3/E","4/R"};
         addKeyListener(this);
         setSize(width, height);
         setBackground(Color.white);
@@ -73,17 +76,25 @@ public class Main extends Applet implements Runnable, KeyListener
         int closestPointIndex = numPointsPerTriangle / 3;
         line = new Line(tri1.getPoints()[closestPointIndex], tri2.getPoints()[closestPointIndex], numPointsPerLine);
 
-        leftSpheres = new Sphere[2];
-        rightSpheres = new Sphere[2];
-        leftSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, true, "blue","1/Q");
-        leftSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, true, false, "blue","2/W");
-        rightSpheres[0] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, true, "red", "3/E");
-        rightSpheres[1] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, false, false, "red", "4/R");
-        leftSpheres[0].whoAreMyFellowSpheres(leftSpheres, rightSpheres);
-        leftSpheres[1].whoAreMyFellowSpheres(leftSpheres, rightSpheres);
-        rightSpheres[0].whoAreMyFellowSpheres(leftSpheres, rightSpheres);
-        rightSpheres[1].whoAreMyFellowSpheres(leftSpheres, rightSpheres);
+        spheres = new Sphere[4];
 
+        for(int i = 0; i < spheres.length; i++){
+            if(i < 2){
+                color = "blue";
+                left = true;
+                first = (i == 0) ? true: false;
+            }
+            else
+            {
+                color = "red";
+                left = false;
+                first = (i == 2) ? true: false;
+            }
+            spheres[i] = new Sphere(50, numPointsPerLine, line.getPoints(), numPointsPerTriangle, tri1.getPoints(), tri2.getPoints(), 1, left,first,color,titles[i]);
+        }
+        for(int i=0; i < spheres.length; i++){
+            spheres[i].whoAreMyFellowSpheres(spheres);
+        }
     }
 
     public void paint(Graphics g)
@@ -95,10 +106,9 @@ public class Main extends Applet implements Runnable, KeyListener
         line.draw(g);
         try
         {
-            leftSpheres[0].draw(g);
-            leftSpheres[1].draw(g);
-            rightSpheres[0].draw(g);
-            rightSpheres[1].draw(g);
+            for(int i=0; i < spheres.length; i++){
+                spheres[i].draw(g);
+            }
         } catch (NoSuchFieldException e)
         {
             e.printStackTrace();
@@ -124,35 +134,18 @@ public class Main extends Applet implements Runnable, KeyListener
     public void keyReleased(KeyEvent e)
     {
         char dir = e.getKeyChar();
-        boolean inc;
         if (dir == '1' || dir == 'q')
         {
-            if (dir == '1')
-                inc = true;
-            else
-                inc = false;
-            leftSpheres[0].changeSpeed(inc);
+            spheres[0].changeSpeed((dir == '1'));
         } else if (dir == '2' || dir == 'w')
         {
-            if (dir == '2')
-                inc = true;
-            else
-                inc = false;
-            leftSpheres[1].changeSpeed(inc);
+            spheres[1].changeSpeed((dir == '2'));
         } else if (dir == '3' || dir == 'e')
         {
-            if (dir == '3')
-                inc = true;
-            else
-                inc = false;
-            rightSpheres[0].changeSpeed(inc);
+            spheres[2].changeSpeed((dir == '3'));
         } else if (dir == '4' || dir == 'r')
         {
-            if (dir == '4')
-                inc = true;
-            else
-                inc = false;
-            rightSpheres[1].changeSpeed(inc);
+            spheres[3].changeSpeed((dir == '4'));
         }
     }
 }

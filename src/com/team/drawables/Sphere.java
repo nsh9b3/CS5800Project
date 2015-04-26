@@ -8,8 +8,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 import java.util.Arrays;
-import java.util.Random;
-
 
 public class Sphere
 {
@@ -20,21 +18,31 @@ public class Sphere
     int pointPos;
     int numLocations;
 
+    // Current location
+    boolean inCS = false;
+    boolean onRightSide = false;
+
+    // Future Location
+    boolean goingToCS = false;
+    boolean goingToRightSide = false;
+
     String title;
     Point[] points;
+    Point[] leftTriangle;
+    Point[] rightTriangle;
 
     // the other spheres, this way they can talk to one another.
     Sphere[] fellowSpheres;
     String color;
 
+    // Debugging strings
+    String currentSpot = "";
+    String nextSpot = "";
+
     Point[] line;
 
     // the time stamp
     Timestamp time = new Timestamp(Calendar.getInstance().getTime().getTime());
-
-    // attempt to keep spheres out of CS
-    boolean permission;
-    boolean allowOthers;
 
     public Sphere(int radius, int numLinePos, Point[] linePoints, int numTriPos, Point[] triPoints1, Point[] triPoints2, int speed, boolean startLeft, boolean isFirst, String color, String title)
     {
@@ -43,9 +51,9 @@ public class Sphere
         this.speed = speed;
         this.color = color.toUpperCase();
         this.title = String.valueOf(title);
-        this.line = linePoints;
-        this.permission = false;
-        this.allowOthers = true;
+        line = linePoints;
+        leftTriangle = triPoints1;
+        rightTriangle = triPoints2;
 
         numLocations = (2 * numTriPos) + (2 * numLinePos) - 2;
 
@@ -90,15 +98,47 @@ public class Sphere
             k = k + 1;
         }
         this.center = new Point(points[pointPos]);
-
     }
 
     public void draw(Graphics g) throws NoSuchFieldException
     {
+        this.time.setTime(Calendar.getInstance().getTime().getTime());
+        whereAmI();
+        g.drawString("Entering CS? " + this.goingToCS, center.getX() + (radius) + 85, (center.getY() + radius) - 150);
+
+        g.drawString("Permission " + String.valueOf(askEveryone()), center.getX() - (radius), center.getY() - radius);
+
+        g.setColor(Color.black);
+        g.drawString(title, center.getX() - (radius / 2), center.getY() - (radius / 2));
+        g.drawString("Speed " + String.valueOf(speed), center.getX() - (radius), center.getY() + radius);
+        if(this.inCS){
+            this.currentSpot = "Center";
+        }else if(this.onRightSide){
+            this.currentSpot = "Right Side";
+        }else{
+            this.currentSpot = "Left Side";
+        }
+        if(this.goingToCS){
+            this.nextSpot = "Going to Center";
+        }else if(this.goingToRightSide){
+            this.nextSpot = "Going to Right";
+        }
+        else{
+            this.nextSpot = "Going to Left";
+        }
+
+        //g.drawString("Location " + this.currentSpot, center.getX() - (radius), 35 + (center.getY() + radius));
+        //g.drawString(this.nextSpot, center.getX() - (radius), 65 + (center.getY() + radius));
+
+        // BEFORE updatingPosition see if you have permission to move onwards
+        finalDraw(g);
+    }
+
+    private void finalDraw(Graphics g) throws NoSuchFieldException{
         Color spColor;
         try
         {
-            Field field = Class.forName("java.awt.Color").getField(color);
+            Field field = Class.forName("java.awt.Color").getField(this.color);
             spColor = (Color) field.get(null);
             g.setColor(spColor);
         } catch (ClassNotFoundException e)
@@ -108,48 +148,31 @@ public class Sphere
         {
             e.printStackTrace();
         }
-        g.fillOval((int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2), radius, radius);
-        g.setColor(Color.black);
-        g.drawString(title, (int) center.getX() - (radius / 2), (int) center.getY() - (radius / 2));
-        g.drawString("Speed " + String.valueOf(speed), center.getX() - (radius), (int) center.getY() + radius);
-        // BEFORE updatingPosition see if you have permission to move onwards
-        if(allowedToMove())
-        {
-            updatePosition(g);
-        }
-    }
+        g.fillOval(center.getX() - (radius / 2), center.getY() - (radius / 2), radius, radius);
 
-    private boolean allowedToMove()
-    {
-        if(inCS()){
-            return true;
-        }else{
-            if(wantIntoCS()){
-                this.time.setTime(Calendar.getInstance().getTime().getTime());
-                makeRequests();
-                if (this.permission == false)
-                {
-                    return false;
-                }
-                return true;
-            }else{
-                return true;
+        if(this.goingToCS)
+        {
+            if(this.inCS){
+                updatePosition(g);
             }
+            if(askEveryone() == false)
+            {
+                return;
+            }else{
+                updatePosition(g);
+            }
+        }else{
+            updatePosition(g);
+
         }
     }
 
     private void updatePosition(Graphics g)
     {
-        g.drawString("Permission: "+Boolean.toString(permission), (int) center.getX() + (radius * 2), (int) center.getY() - (radius * 2));
-        g.drawString("Allow Others: "+Boolean.toString(allowOthers), (int) center.getX() + (radius * 2), (int) center.getY() - (radius / 2));
-
         pointPos = (pointPos + speed) % numLocations;
         center = points[pointPos];
-        g.drawString("", (int) center.getX() + (radius / 2), (int) center.getY() - (radius / 2));
-        if (!inCS())
-        {
-            this.permission = false;
-        }
+        this.time.setTime(Calendar.getInstance().getTime().getTime());
+        g.drawString("Time " + String.valueOf(time), center.getX() - (radius), 55 + center.getY() - radius);
     }
 
     public void changeSpeed(boolean inc)
@@ -165,98 +188,62 @@ public class Sphere
         }
     }
 
-    // Tells sphere who the other spheres are
-    public void whoAreMyFellowSpheres(Sphere[] left, Sphere[] right)
-    {
-        fellowSpheres = new Sphere[left.length + right.length];
-        fellowSpheres[0] = left[0];
-        fellowSpheres[1] = left[1];
-        fellowSpheres[2] = right[0];
-        fellowSpheres[3] = right[1];
-    }
-
-
     public void whoAreMyFellowSpheres(Sphere[] spheres)
     {
         fellowSpheres = new Sphere[spheres.length-1];
-        for(int i = 0; i < fellowSpheres.length; i++){
+        int index = 0;
+        for(int i = 0; i < spheres.length; i++){
             if(spheres[i] != this){
-               fellowSpheres[i] = spheres[i];
+               fellowSpheres[index] = spheres[i];
+                index++;
             }
         }
     }
 
+    private void whereAmI(){
+        this.time.setTime(Calendar.getInstance().getTime().getTime());
 
-    // Finds out if other spheres are ok with this accessing CS
-    private void makeRequests()
-    {
-        // Ask all spheres a question
+        // Current location
+        this.inCS = Arrays.asList(line).contains(this.center);
+        this.onRightSide = Arrays.asList(rightTriangle).contains(this.center);
+
+        Point futureCenter;
+        if(!onRightSide){
+            futureCenter = points[(pointPos + speed) % numLocations];
+
+        }else{
+            int temp = (pointPos + speed) % numLocations;
+            temp = (temp + speed) % numLocations;
+            futureCenter = points[temp];
+        }
+
+        // Future Location
+        this.goingToCS = Arrays.asList(line).contains(futureCenter);
+        this.goingToRightSide = Arrays.asList(rightTriangle).contains(futureCenter);
+    }
+
+    private boolean askEveryone(){
+        boolean verdict = true;
+        this.time.setTime(Calendar.getInstance().getTime().getTime());
         for (int i = 0; i < fellowSpheres.length; i++)
         {
-            if (fellowSpheres[i] != this) // Dont ask yourself
+            if(fellowSpheres[i].areYouInTheCS() || fellowSpheres[i].areYouGoingInToCS(time))
             {
-                // if any of your fellow spheres does not give the ok then you can't enter.
-                if (fellowSpheres[i].okToEnterCS(this.time) == false)
-                {
-                    this.permission = false;
-                    break;
-                }
+                verdict = false;
             }
         }
-        // if no one says no then that means you can enter cs
-        this.permission = true;
+        return verdict;
     }
 
-    private boolean wantIntoCS()
-    {
-        Point nextPoint = points[(pointPos + speed) % numLocations];
-        if (Arrays.asList(line).contains(nextPoint))
-        {
-            this.allowOthers = false;
-            return true;
-        } else
-        {
-            this.allowOthers = true;
+    public boolean areYouGoingInToCS(Timestamp timeToCheck){
+        if(this.time.before(timeToCheck))
+           return this.goingToCS;
+        else
             return false;
-        }
     }
 
-
-    private boolean inCS()
-    {
-        if (Arrays.asList(line).contains(points[pointPos]))
-        {
-            this.allowOthers = false;
-            return true;
-        } else
-        {
-            this.allowOthers = true;
-            return false;
-        }
+    public boolean areYouInTheCS(){
+        return this.inCS;
     }
 
-    public boolean okToEnterCS(Timestamp stamp)
-    {
-        //return allowOthers;
-        if (this.allowOthers)
-        {
-            if (wantIntoCS())
-            {
-                if (stamp.after(time))
-                {
-                    return true;
-                } else
-                {
-                    return false;
-                }
-            } else
-            {
-                return true;
-            }
-        }
-        else{
-            return false;
-        }
-
-    }
 }
